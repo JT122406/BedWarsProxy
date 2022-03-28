@@ -22,6 +22,8 @@ public class ArenaManager implements BedWars.ArenaUtil {
 
     private static ArenaManager instance = null;
 
+    private ArrayList<ArrayList<CachedArena>> queue = new ArrayList<>();
+
     private ArenaManager() {
         instance = this;
     }
@@ -124,6 +126,35 @@ public class ArenaManager implements BedWars.ArenaUtil {
     public boolean joinRandomFromGroup(@NotNull Player p, String group) {
         //rewrite by JT122406
         //checks for party leader
+        //first person it will format queue
+        if (queue.isEmpty()  && (!getArenas().isEmpty())){
+            ArrayList<String> groups = new ArrayList<>();
+            ArrayList<CachedArena> arenas = new ArrayList<>();
+            arenas.addAll(getArenas());
+            for (CachedArena a:getArenas()) {
+                //crates a list of groups name
+                if (groups.isEmpty() || !groups.contains(a.getArenaGroup())){
+                    groups.add(a.getArenaGroup());
+                }
+            }
+            for (String groupname : groups) {
+                ArrayList<CachedArena> group = new ArrayList<>();
+                for (CachedArena a : arenas) {
+                    if (groupname == a.getArenaGroup()){
+                        group.add(a);
+                        arenas.remove(a);
+                    }
+                }
+                queue.add(group);
+            }
+            if (config.getYml().getBoolean(ConfigPath.GENERAL_CONFIGURATION_RANDOMARENAS)) {
+                for (ArrayList arrayList : queue) {
+                    Collections.shuffle(arrayList);
+                }
+                //randomize it
+            }
+        }
+
         if (getParty().hasParty(p.getUniqueId()) && !getParty().isOwner(p.getUniqueId())) {
             p.sendMessage(LanguageManager.get().getMsg(p, Messages.COMMAND_JOIN_DENIED_NOT_PARTY_LEADER));
             return false;
@@ -133,6 +164,8 @@ public class ArenaManager implements BedWars.ArenaUtil {
             p.sendMessage(LanguageManager.get().getMsg(p, Messages.COMMAND_JOIN_NO_EMPTY_FOUND));
             return true;
         }
+
+
         //puts only arenas from group into arraylist
         List<CachedArena> arenaList = new ArrayList<>();
         int amount = BedWarsProxy.getParty().hasParty(p.getUniqueId()) ? BedWarsProxy.getParty().getMembers(p.getUniqueId()).size() : 1;
