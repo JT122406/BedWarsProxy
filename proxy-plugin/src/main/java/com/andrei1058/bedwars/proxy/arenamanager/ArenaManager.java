@@ -138,14 +138,14 @@ public class ArenaManager implements BedWars.ArenaUtil {
                 }
             }
             for (String groupname : groups) {
-                ArrayList<CachedArena> group = new ArrayList<>();
+                ArrayList<CachedArena> groupArena = new ArrayList<>();
                 for (CachedArena a : arenas) {
                     if (groupname == a.getArenaGroup()){
-                        group.add(a);
+                        groupArena.add(a);
                         arenas.remove(a);
                     }
                 }
-                queue.add(group);
+                queue.add(groupArena);
             }
             if (config.getYml().getBoolean(ConfigPath.GENERAL_CONFIGURATION_RANDOMARENAS)) {
                 for (ArrayList arrayList : queue) {
@@ -164,6 +164,7 @@ public class ArenaManager implements BedWars.ArenaUtil {
             p.sendMessage(LanguageManager.get().getMsg(p, Messages.COMMAND_JOIN_NO_EMPTY_FOUND));
             return true;
         }
+
 
 
         //puts only arenas from group into arraylist
