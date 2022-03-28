@@ -131,6 +131,7 @@ public class ArenaManager implements BedWars.ArenaUtil {
             p.sendMessage(LanguageManager.get().getMsg(p, Messages.COMMAND_JOIN_DENIED_NOT_PARTY_LEADER));
             return false;
         }
+      
         Bukkit.getScheduler().runTaskAsynchronously(BedWarsProxy.getPlugin(), () -> {
 
             if (getArenas().isEmpty())
@@ -151,6 +152,7 @@ public class ArenaManager implements BedWars.ArenaUtil {
                     return;
                 }
             }
+
 
             if (arenaList.isEmpty()) {
                 p.sendMessage(LanguageManager.get().getMsg(p, Messages.COMMAND_JOIN_NO_EMPTY_FOUND));
@@ -180,6 +182,7 @@ public class ArenaManager implements BedWars.ArenaUtil {
         });
 
         return true;
+
     }
 
     /**
@@ -203,6 +206,7 @@ public class ArenaManager implements BedWars.ArenaUtil {
             p.sendMessage(LanguageManager.get().getMsg(p, Messages.COMMAND_JOIN_DENIED_NOT_PARTY_LEADER));
             return false;
         }
+
         Bukkit.getScheduler().runTaskAsynchronously(BedWarsProxy.getPlugin(), () -> {
             //puts only arenas from group into arraylist
             List<CachedArena> arenaList = new ArrayList<>();
