@@ -20,6 +20,8 @@ public class ArenaManager implements BedWars.ArenaUtil {
     private final LinkedList<CachedArena> arenas = new LinkedList<>();
     private final HashMap<String, ArenaSocketTask> socketByServer = new HashMap<>();
 
+    private ArrayList<CachedArena> Arenaholders = new ArrayList<>();
+
     private static ArenaManager instance = null;
 
     private ArenaManager() {
@@ -143,7 +145,9 @@ public class ArenaManager implements BedWars.ArenaUtil {
                 if ((current.getArenaGroup().equalsIgnoreCase(group)) && ((current.getMaxPlayers() - current.getCurrentPlayers()) > amount) && (((current.getStatus() == ArenaStatus.WAITING) || (current.getStatus() == ArenaStatus.STARTING))))
                     arenaList.add(current);
                 else if ((current.getArenaGroup().equalsIgnoreCase(group))  && ((current.getMaxPlayers() - current.getCurrentPlayers()) == amount) && (((current.getStatus() == ArenaStatus.WAITING) || (current.getStatus() == ArenaStatus.STARTING)))) {
-                    current.addPlayer(p, null);  //Perfect fit conditions
+                    Bukkit.getScheduler().runTask(BedWarsProxy.getPlugin(), () -> {
+                        current.addPlayer(p, null);  //Perfect fit conditions
+                    });
                     return;
                 }
             }
@@ -159,17 +163,20 @@ public class ArenaManager implements BedWars.ArenaUtil {
                 //randomize it then we will sort by players in arena
             }
 
-            CachedArena hold = arenaList.get(0);
-            //Reorder based on players in game
-            for (int i = 1; i < arenaList.size(); i++)
-                if ((arenaList.get(i).getCurrentPlayers() > hold.getCurrentPlayers()) && (arenaList.get(i).getMaxPlayers() - arenaList.get(i).getCurrentPlayers() > amount))
-                    hold = arenaList.get(i);
-                else if ((arenaList.get(i).getMaxPlayers() - arenaList.get(i).getCurrentPlayers()) == amount){  //If there is exactly the amount of players in the party left in a waiting arena join that arena and break to save process time
-                    arenaList.get(i).addPlayer(p, null);
-                    return;
-                }
+            Bukkit.getScheduler().runTask(BedWarsProxy.getPlugin(), () -> {
+                CachedArena hold = arenaList.get(0);
+                //Reorder based on players in game
+                for (int i = 1; i < arenaList.size(); i++)
+                    if ((arenaList.get(i).getCurrentPlayers() > hold.getCurrentPlayers()) && (arenaList.get(i).getMaxPlayers() - arenaList.get(i).getCurrentPlayers() > amount))
+                        hold = arenaList.get(i);
+                    else if ((arenaList.get(i).getMaxPlayers() - arenaList.get(i).getCurrentPlayers()) == amount){  //If there is exactly the amount of players in the party left in a waiting arena join that arena and break to save process time
+                        arenaList.get(i).addPlayer(p, null);
+                        return;
+                    }
 
-            hold.addPlayer(p, null);
+                hold.addPlayer(p, null);
+            });
+
         });
 
         return true;
@@ -204,7 +211,9 @@ public class ArenaManager implements BedWars.ArenaUtil {
                 if (((current.getMaxPlayers() - current.getCurrentPlayers()) >= amount) && (((current.getStatus() == ArenaStatus.WAITING) || (current.getStatus() == ArenaStatus.STARTING))))
                     arenaList.add(current);
                 else if (((current.getMaxPlayers() - current.getCurrentPlayers()) == amount) && (((current.getStatus() == ArenaStatus.WAITING) || (current.getStatus() == ArenaStatus.STARTING)))) {
-                    current.addPlayer(p, null);  //Perfect fit conditions
+                    Bukkit.getScheduler().runTask(BedWarsProxy.getPlugin(), () -> {
+                        current.addPlayer(p, null); //Perfect fit conditions
+                    });
                     return;
                 }
             }
@@ -221,17 +230,20 @@ public class ArenaManager implements BedWars.ArenaUtil {
             }
 
 
-            CachedArena hold = arenaList.get(0);
-            //Reorder based on players in game
-            for (int i = 1; i < arenaList.size(); i++) {
-                if (arenaList.get(i).getCurrentPlayers() > hold.getCurrentPlayers() && (arenaList.get(i).getMaxPlayers() - arenaList.get(i).getCurrentPlayers() >= amount))
-                    hold = arenaList.get(i);
-                else if ((arenaList.get(i).getMaxPlayers() - arenaList.get(i).getCurrentPlayers()) == amount){  //If there is exactly the amount of players in the party left in a waiting arena join that arena and break to save process time
-                    arenaList.get(i).addPlayer(p, null);
-                    return;
+            Bukkit.getScheduler().runTask(BedWarsProxy.getPlugin(), () -> {
+                CachedArena hold = arenaList.get(0);
+                //Reorder based on players in game
+                for (int i = 1; i < arenaList.size(); i++) {
+                    if (arenaList.get(i).getCurrentPlayers() > hold.getCurrentPlayers() && (arenaList.get(i).getMaxPlayers() - arenaList.get(i).getCurrentPlayers() >= amount))
+                        hold = arenaList.get(i);
+                    else if ((arenaList.get(i).getMaxPlayers() - arenaList.get(i).getCurrentPlayers()) == amount){  //If there is exactly the amount of players in the party left in a waiting arena join that arena and break to save process time
+                        arenaList.get(i).addPlayer(p, null);
+                        return;
+                    }
                 }
-            }
-            hold.addPlayer(p, null);
+                hold.addPlayer(p, null);
+            });
+
         });
 
         return true;
