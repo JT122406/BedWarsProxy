@@ -118,6 +118,7 @@ public class ArenaManager implements BedWars.ArenaUtil {
         return true;
     }
 
+
     /**
      * Add a player to the most filled arena from a group.
      */
