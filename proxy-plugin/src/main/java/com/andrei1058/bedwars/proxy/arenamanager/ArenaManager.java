@@ -70,19 +70,18 @@ public class ArenaManager implements BedWars.ArenaUtil {
                 }
             Bukkit.getServer().getLogger().info(groups.toString());
 
-                ArrayList<CachedArena> holder = new ArrayList<>();
-                holder.addAll(getArenas());
+            ArrayList<CachedArena> holder = new ArrayList<>(getArenas());
 
                 for (int i = 0; i < groups.size(); i++) {
                     String groupname = groups.get(i);
+                    Bukkit.getLogger().info(groupname + "We are in the loop");
                     if (queue.get(i).isEmpty()){
                         ArrayList<CachedArena> Arena9 = new ArrayList<>();
-                        for (int j = 0; j < holder.size(); j++){
-                            CachedArena a1 = holder.get(j);
+                        for (int j = 0; j < getArenas().size(); j++){
+                            CachedArena a1 = getArenas().get(j);
                             if (a1.getArenaGroup().equalsIgnoreCase(groupname)){
                                 Arena9.add(a1);
-                                holder.remove(a1);
-                                j--;
+                                Bukkit.getLogger().info(Arena9.toString());
                             }
                         }
                         if (config.getYml().getBoolean(ConfigPath.GENERAL_CONFIGURATION_RANDOMARENAS)) {

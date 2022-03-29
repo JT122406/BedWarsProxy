@@ -36,8 +36,8 @@ public class ArenaSocketTask implements Runnable {
             e.printStackTrace();
         }
         System.out.println(socket.toString());
-        ArenaManager.getInstance().createQueue();
-        ArenaManager.getInstance().randomQueuemaker();
+        //ArenaManager.getInstance().createQueue();
+        //ArenaManager.getInstance().randomQueuemaker();
     }
 
     @Override
@@ -159,6 +159,7 @@ public class ArenaSocketTask implements Runnable {
                 break;
             }
         }
+
     }
 
     public PrintWriter getOut() {
