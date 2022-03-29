@@ -191,11 +191,11 @@ public class ArenaManager implements BedWars.ArenaUtil {
                         queue.add(arenaList.get(i));
                         return;
                     }
-                hold.addPlayer(p, null);
+                    hold.addPlayer(p, null);
+                    queue.add(hold);
             });
 
         });
-        Bukkit.getServer().getLogger().info(queue.get(0).getArenaName());
         return true;
 
     }
