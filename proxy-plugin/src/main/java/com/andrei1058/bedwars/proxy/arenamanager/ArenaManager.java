@@ -56,13 +56,15 @@ public class ArenaManager implements BedWars.ArenaUtil {
 
     public void createQueue(){
         Bukkit.getServer().getLogger().info("Running Create Queue method");
-        if (getArenas().isEmpty())
+        if (getArenas().isEmpty())  //no arenas or no socket connection
             return;
+
+        //creates queue system
         Bukkit.getScheduler().runTaskAsynchronously(BedWarsProxy.getPlugin(), () -> {
             Bukkit.getServer().getLogger().info(getArenas().toString());
             if (groups.isEmpty())
                 for (CachedArena a : getArenas()) {
-                    if (!groups.contains(a.getArenaGroup().toLowerCase())) {
+                    if (!groups.contains(a.getArenaGroup())) {
                         Bukkit.getServer().getLogger().info("Adding thing " + a.getArenaName());
                         groups.add(a.getArenaGroup());
                         Bukkit.getServer().getLogger().info(groups.toString());
@@ -75,7 +77,6 @@ public class ArenaManager implements BedWars.ArenaUtil {
                 for (int i = 0; i < groups.size(); i++) {
                     String groupname = groups.get(i);
                     Bukkit.getLogger().info(groupname + "We are in the loop");
-                    if (queue.get(i).isEmpty()){
                         ArrayList<CachedArena> Arena9 = new ArrayList<>();
                         for (int j = 0; j < getArenas().size(); j++){
                             CachedArena a1 = getArenas().get(j);
@@ -84,15 +85,27 @@ public class ArenaManager implements BedWars.ArenaUtil {
                                 Bukkit.getLogger().info(Arena9.toString());
                             }
                         }
-                        if (config.getYml().getBoolean(ConfigPath.GENERAL_CONFIGURATION_RANDOMARENAS)) {
-                            Collections.shuffle(Arena9);
+                        if (!Arena9.isEmpty()){
+                            if (config.getYml().getBoolean(ConfigPath.GENERAL_CONFIGURATION_RANDOMARENAS)) {
+                                Collections.shuffle(Arena9);
+                            }
+                            queue.add(Arena9);
                         }
-                        Bukkit.getServer().getLogger().info(Arena9.toString());
-                        queue.add(Arena9);
-                    }
+                        else
+                        {
+                        //remove group from list to avoid issues because there are no arenas in said group
+                            //This SHOULD NOT HAPPEN BUT IS HERE JUST INCASE
+                        groups.remove(i);
+                        groups.trimToSize();
+                        i--;
+                        }
+                        Bukkit.getLogger().info("Adding arena to queue");
+
+                    Bukkit.getLogger().info(queue.size() + "here is queue size");
+
                 }
+            Bukkit.getServer().getLogger().info(queue.get(0).get(0).getArenaName());
         });
-        Bukkit.getServer().getLogger().info(queue.get(0).get(0).getArenaName());
     }
 
     public void registerArena(@NotNull CachedArena arena) {
@@ -176,8 +189,8 @@ public class ArenaManager implements BedWars.ArenaUtil {
     }
 
     public ArrayList<CachedArena> reorder(ArrayList<CachedArena> c){
+        Bukkit.getServer().getLogger().info("Reorder Enter");
         Bukkit.getServer().getLogger().info(c.get(0).getArenaName());
-        Bukkit.getServer().getLogger().info("Reorder 1");
         for (int i = 0; i < c.size(); i++){
             for (int j = 0; j < c.size(); j++){
                 if (i == j)
@@ -199,7 +212,7 @@ public class ArenaManager implements BedWars.ArenaUtil {
             }
         }
         Bukkit.getServer().getLogger().info(c.get(0).getArenaName());
-        Bukkit.getServer().getLogger().info("Reorder 2");
+        Bukkit.getServer().getLogger().info("Reorder Exit");
         return c;
     }
 
@@ -221,6 +234,7 @@ public class ArenaManager implements BedWars.ArenaUtil {
     public boolean joinRandomFromGroup(@NotNull Player p, String group) {
         //rewrite by JT122406
         //checks for party leader
+        //basic logic
         if (getParty().hasParty(p.getUniqueId()) && !getParty().isOwner(p.getUniqueId())) {
             p.sendMessage(LanguageManager.get().getMsg(p, Messages.COMMAND_JOIN_DENIED_NOT_PARTY_LEADER));
             return false;
@@ -229,20 +243,26 @@ public class ArenaManager implements BedWars.ArenaUtil {
             p.sendMessage(LanguageManager.get().getMsg(p, Messages.COMMAND_JOIN_NO_EMPTY_FOUND));
             return true;
         }
-        //Bukkit.getServer().getLogger().info(queue.get(0).get(0).getArenaName());
-        Bukkit.getScheduler().runTaskAsynchronously(BedWarsProxy.getPlugin(), () -> {
 
+        //Async queue and join handler
+        Bukkit.getScheduler().runTaskAsynchronously(BedWarsProxy.getPlugin(), () -> {
+            //Section 1
+            Bukkit.getLogger().info("Entering Section 1");
             int amount = BedWarsProxy.getParty().hasParty(p.getUniqueId()) ? BedWarsProxy.getParty().getMembers(p.getUniqueId()).size() : 1;
-            if (queue.isEmpty()){
+            if (queue.isEmpty()){  //verify that queue exists
                 createQueue();
-                Bukkit.getServer().getLogger().info("Hit this!");
-            }else {
+                Bukkit.getServer().getLogger().info("Hit this! means that we got out of create Queue");
+            }else{
                 for (ArrayList test: queue) {
-                    if (test.isEmpty()){
+                    if (test.isEmpty()){  //if a certain group is empty -> JT check this later please/ optimize it
                         createQueue();
                     }
                 }
             }
+            Bukkit.getLogger().info("Exit Section 1");
+
+            //Section 2
+            Bukkit.getLogger().info("Entering Section 2");
             int i = 0;
             ArrayList<CachedArena> ArenaList = new ArrayList<>();
             for (ArrayList<CachedArena> pog: queue) {
@@ -252,25 +272,28 @@ public class ArenaManager implements BedWars.ArenaUtil {
                 else
                 {
                     if (pog.get(0).getArenaName().equalsIgnoreCase(group)){
-                        ArenaList.addAll(pog);
+                        ArenaList.addAll(pog);  //Adds all arenas from certain group to ArenaList
+                        Bukkit.getLogger().info("Printing pog array: " + pog);
                         i = queue.indexOf(pog);
                         break;
                     }
                 }
             }
+            Bukkit.getLogger().info("Exiting Section 2");
 
+            //Section 3
+            Bukkit.getLogger().info("Entering Section 3");
             //puts only arenas from group into arraylist
-            List<CachedArena> arenaList = reorder(ArenaList);
+            List<CachedArena> arenaList = reorder(ArenaList);  //reorders based on in game players
             if (arenaList.isEmpty()) {
                 p.sendMessage(LanguageManager.get().getMsg(p, Messages.COMMAND_JOIN_NO_EMPTY_FOUND));
                 return;
             }
+
             //You are here JT
             for (CachedArena current : arenaList) {
                 if ((current.getArenaGroup().equalsIgnoreCase(group)) && ((current.getMaxPlayers() - current.getCurrentPlayers()) > amount) && (((current.getStatus() == ArenaStatus.WAITING) || (current.getStatus() == ArenaStatus.STARTING))))
-                    Bukkit.getScheduler().runTask(BedWarsProxy.getPlugin(), () -> {
-                        current.addPlayer(p, null);
-                    });
+                    Bukkit.getScheduler().runTask(BedWarsProxy.getPlugin(), () -> current.addPlayer(p, null));
                 else if ((current.getArenaGroup().equalsIgnoreCase(group))  && ((current.getMaxPlayers() - current.getCurrentPlayers()) == amount) && (((current.getStatus() == ArenaStatus.WAITING) || (current.getStatus() == ArenaStatus.STARTING)))) {
                     Bukkit.getScheduler().runTask(BedWarsProxy.getPlugin(), () -> {
                         current.addPlayer(p, null);  //Perfect fit conditions
@@ -282,6 +305,7 @@ public class ArenaManager implements BedWars.ArenaUtil {
                 }
             }
         });
+        Bukkit.getLogger().info("Exiting Section 3");
         updateQueue();
         return true;
     }
