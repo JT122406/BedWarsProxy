@@ -188,9 +188,9 @@ public class ArenaManager implements BedWars.ArenaUtil {
         return true;
     }
 
-    public ArrayList<CachedArena> reorder(ArrayList<CachedArena> c){
+    public void reorder(ArrayList<CachedArena> c){
         Bukkit.getServer().getLogger().info("Reorder Enter");
-        Bukkit.getServer().getLogger().info(c.get(0).getArenaName());
+        Bukkit.getServer().getLogger().info(c.toString());
         for (int i = 0; i < c.size(); i++){
             for (int j = 0; j < c.size(); j++){
                 if (i == j)
@@ -211,9 +211,8 @@ public class ArenaManager implements BedWars.ArenaUtil {
                 }
             }
         }
-        Bukkit.getServer().getLogger().info(c.get(0).getArenaName());
+        Bukkit.getServer().getLogger().info(c.toString());
         Bukkit.getServer().getLogger().info("Reorder Exit");
-        return c;
     }
 
     public void updateQueue(){
@@ -285,7 +284,7 @@ public class ArenaManager implements BedWars.ArenaUtil {
             Bukkit.getLogger().info("Entering Section 3");
             //puts only arenas from group into arraylist
             Bukkit.getLogger().info("Printing ArenaList " + ArenaList);
-            //List<CachedArena> arenaList = reorder(ArenaList);  //reorders based on in game players
+            reorder(ArenaList);  //reorders based on in game players
             if (ArenaList.isEmpty()) {
                 p.sendMessage(LanguageManager.get().getMsg(p, Messages.COMMAND_JOIN_NO_EMPTY_FOUND));
                 return true;
