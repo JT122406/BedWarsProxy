@@ -202,19 +202,26 @@ public class ArenaManager implements BedWars.ArenaUtil {
     }
 
     public void updateQueue(){
+        ArrayList<ArrayList> remove2 = new ArrayList<>();
         if(!queue.isEmpty())
             for (ArrayList<CachedArena> test : queue) {
+                int i = queue.indexOf(test);
                 if (!test.isEmpty()){
+                    ArrayList<CachedArena> remove = new ArrayList<>();
                     for (CachedArena a : test) {
                         if ((a.getStatus() == ArenaStatus.PLAYING)  || (a.getStatus() == ArenaStatus.RESTARTING)){
-                            queue.get(queue.indexOf(test)).remove((queue.get(queue.indexOf(test)).indexOf(a)));
+                            remove.add(queue.get(i).get((queue.get(i).indexOf(a))));
                         }
                     }
+                    remove2.add(remove);
+                    //queue.get(i).removeAll(remove);
                 } else {
                     createQueue();
                 }
             }
-        }
+        queue.removeAll(remove2);
+    }
+
 
     /**
      * Add a player to the most filled arena from a group.
