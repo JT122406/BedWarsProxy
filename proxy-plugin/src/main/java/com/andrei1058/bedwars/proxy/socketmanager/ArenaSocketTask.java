@@ -35,7 +35,7 @@ public class ArenaSocketTask implements Runnable {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        System.out.println(socket.toString());
+        System.out.println(socket);
         //ArenaManager.getInstance().createQueue();
         //ArenaManager.getInstance().randomQueuemaker();
     }
@@ -103,6 +103,7 @@ public class ArenaSocketTask implements Runnable {
                                 modified = true;
                             }
                             if (ArenaStatus.valueOf(json.get("arena_status").getAsString()) != ca.getStatus()) {
+                                ArenaManager.getInstance().updateQueue();  //Maybe
                                 ca.setStatus(ArenaStatus.valueOf(json.get("arena_status").getAsString()));
                                 modified = true;
                             }

@@ -72,6 +72,7 @@ public class ArenaSelectorListener implements Listener {
 
     @EventHandler
     public void onCacheUpdate(ArenaCacheUpdateEvent e) {
+        ArenaManager.getInstance().updateQueue();
         for (Player p : ArenaGUI.getRefresh().keySet()) {
             ArenaGUI.refreshInv(p, ArenaGUI.getRefresh().get(p));
         }
