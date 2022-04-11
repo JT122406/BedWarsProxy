@@ -9,6 +9,7 @@ import com.andrei1058.bedwars.proxy.api.event.ArenaCacheUpdateEvent;
 import com.andrei1058.bedwars.proxy.language.Language;
 import com.andrei1058.bedwars.proxy.api.Messages;
 import com.andrei1058.bedwars.proxy.BedWarsProxy;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -72,6 +73,7 @@ public class ArenaSelectorListener implements Listener {
 
     @EventHandler
     public void onCacheUpdate(ArenaCacheUpdateEvent e) {
+        Bukkit.getLogger().info("onCacheUpdate FIRE");
         ArenaManager.getInstance().updateQueue();
         for (Player p : ArenaGUI.getRefresh().keySet()) {
             ArenaGUI.refreshInv(p, ArenaGUI.getRefresh().get(p));
@@ -80,6 +82,8 @@ public class ArenaSelectorListener implements Listener {
 
     @EventHandler
     public void onCacheDelete(ArenaCacheRemoveEvent e) {
+        Bukkit.getLogger().info("onCacheRemove FIRE");
+        ArenaManager.getInstance().updateQueue();
         for (Player p : ArenaGUI.getRefresh().keySet()) {
             ArenaGUI.refreshInv(p, ArenaGUI.getRefresh().get(p));
         }

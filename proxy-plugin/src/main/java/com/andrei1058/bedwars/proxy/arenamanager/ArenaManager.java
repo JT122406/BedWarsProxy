@@ -55,12 +55,8 @@ public class ArenaManager implements BedWars.ArenaUtil {
     }
 
     public void createQueue(){
-
         if (getArenas().isEmpty())  //no arenas or no socket connection
             return;
-
-        //creates queue system
-        //Async here if works
 
             if (groups.isEmpty())
                 for (CachedArena a : getArenas()) {
@@ -69,33 +65,46 @@ public class ArenaManager implements BedWars.ArenaUtil {
                     }
                 }
 
-            ArrayList<CachedArena> holder = new ArrayList<>(getArenas());
-
-                for (int i = 0; i < groups.size(); i++) {
-                    String groupname = groups.get(i);
-                        ArrayList<CachedArena> Arena9 = new ArrayList<>();
-                        for (int j = 0; j < getArenas().size(); j++){
-                            CachedArena a1 = getArenas().get(j);
-                            if (a1.getArenaGroup().equalsIgnoreCase(groupname)){
-                                Arena9.add(a1);
-                            }
-                        }
-                        if (!Arena9.isEmpty()){
-                            if (config.getYml().getBoolean(ConfigPath.GENERAL_CONFIGURATION_RANDOMARENAS)) {
-                                Collections.shuffle(Arena9);
-                            }
-                            queue.add(Arena9);
-                        }
-                        else
-                        {
-                        //remove group from list to avoid issues because there are no arenas in said group
-                            //This SHOULD NOT HAPPEN BUT IS HERE JUST INCASE
-                        groups.remove(i);
-                        groups.trimToSize();
-                        i--;
-                        }
-
+                for (String groupname : groups) {
+                    createGroup(groupname);
                 }
+    }
+
+    public void createGroup(String groupname){
+        Bukkit.getLogger().info("-----------------------------------------------");
+        printQueue();
+        Bukkit.getLogger().info("-----------------------------------------------");
+        ArrayList<CachedArena> Arena9 = new ArrayList<>();
+        for (int j = 0; j < getArenas().size(); j++){
+            CachedArena a1 = getArenas().get(j);
+            if (a1.getArenaGroup().equalsIgnoreCase(groupname)){
+                Arena9.add(a1);
+            }
+        }
+        if (!Arena9.isEmpty()){
+            if (config.getYml().getBoolean(ConfigPath.GENERAL_CONFIGURATION_RANDOMARENAS)) {
+                Bukkit.getLogger().info("Randomize");
+                Bukkit.getLogger().info(Arena9.get(0).getArenaName());
+                Collections.shuffle(Arena9);
+                Bukkit.getLogger().info(Arena9.get(0).getArenaName());
+            }
+            queue.add(Arena9);
+            Bukkit.getLogger().info("-----------------------------------------------");
+            printQueue();
+            Bukkit.getLogger().info("-----------------------------------------------");
+        }
+    }
+
+    //add to current queue.get instead of making new sub array method
+
+    public void printQueue(){
+        for (ArrayList<CachedArena> e:queue) {
+            Bukkit.getLogger().info(e.toString());
+            Bukkit.getLogger().info("Printing group: " + groups.get(queue.indexOf(e)));
+            for (CachedArena a: e) {
+             Bukkit.getLogger().info(a.getArenaName());
+            }
+        }
     }
 
     public void registerArena(@NotNull CachedArena arena) {
@@ -202,24 +211,29 @@ public class ArenaManager implements BedWars.ArenaUtil {
     }
 
     public void updateQueue(){
-        ArrayList<ArrayList> remove2 = new ArrayList<>();
-        if(!queue.isEmpty())
+        Bukkit.getLogger().info("updateQueue running");
+        if(!queue.isEmpty()){
+            Bukkit.getLogger().info("-----------------------------------------------");
+            printQueue();
+            Bukkit.getLogger().info("-----------------------------------------------");
             for (ArrayList<CachedArena> test : queue) {
-                int i = queue.indexOf(test);
-                if (!test.isEmpty()){
-                    ArrayList<CachedArena> remove = new ArrayList<>();
-                    for (CachedArena a : test) {
-                        if ((a.getStatus() == ArenaStatus.PLAYING)  || (a.getStatus() == ArenaStatus.RESTARTING)){
-                            remove.add(queue.get(i).get((queue.get(i).indexOf(a))));
-                        }
-                    }
-                    remove2.add(remove);
-                    //queue.get(i).removeAll(remove);
-                } else {
-                    createQueue();
-                }
+                updateGroup(queue.indexOf(test));
             }
-        queue.removeAll(remove2);
+            Bukkit.getLogger().info("-----------------------------------------------");
+            printQueue();
+            Bukkit.getLogger().info("-----------------------------------------------");
+        }
+        Bukkit.getLogger().info("updateQueue done");
+    }
+
+    public void updateGroup(int i){
+        ArrayList<CachedArena> remove2 = new ArrayList<>();
+        for (CachedArena arena : queue.get(i)) {
+            if ((arena.getStatus() == ArenaStatus.PLAYING)  || (arena.getStatus() == ArenaStatus.RESTARTING)){
+                remove2.add(arena);
+            }
+        }
+        queue.get(i).removeAll(remove2);
     }
 
 
@@ -248,7 +262,7 @@ public class ArenaManager implements BedWars.ArenaUtil {
             }else{
                 for (ArrayList test: queue) {
                     if (test.isEmpty()){  //if a certain group is empty -> JT check this later please/ optimize it
-                        createQueue();
+                        createGroup(groups.get(queue.indexOf(test)));
                     }
                 }
             }
